@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PackMap — 내 공간을 지도로</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@300;500;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">PackMap</span>
+    </div>
+    <nav class="space-list" id="space-list"></nav>
+    <button class="add-space-btn" id="add-space-btn">
+      <span>+</span> 공간 추가
+    </button>
+  </aside>
+
+  <!-- Main -->
+  <main id="main">
+    <!-- Empty state -->
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">⬡</div>
+      <h2>공간을 선택하거나 추가하세요</h2>
+      <p>백팩, 서랍, 옷장, 책상 — 모든 공간을 시각적으로 기록하세요.</p>
+      <button class="btn-primary" onclick="document.getElementById('add-space-btn').click()">첫 공간 만들기</button>
+    </div>
+
+    <!-- Editor -->
+    <div class="editor" id="editor" style="display:none">
+      <div class="editor-header">
+        <div>
+          <div class="editor-title-row">
+            <span class="space-type-badge" id="editor-type-badge"></span>
+            <h1 class="editor-title" id="editor-title" contenteditable="true" spellcheck="false"></h1>
+          </div>
+          <p class="editor-subtitle" id="editor-item-count"></p>
+        </div>
+        <div class="editor-actions">
+          <button class="btn-ghost" id="toggle-view-btn">격자 보기</button>
+          <button class="btn-danger" id="delete-space-btn">삭제</button>
+        </div>
+      </div>
+
+      <!-- Grid area -->
+      <div class="grid-wrapper">
+        <div class="cell-grid" id="cell-grid"></div>
+        <button class="add-cell-btn" id="add-cell-btn">
+          <span>＋</span>
+          <span>셀 추가</span>
+        </button>
+      </div>
+
+      <!-- Item list view (hidden by default) -->
+      <div class="list-view" id="list-view" style="display:none">
+        <div class="list-header">
+          <span>이름</span><span>위치</span><span>수량</span><span>태그</span>
+        </div>
+        <div id="list-body"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal: Add/Edit Space -->
+  <div class="modal-overlay" id="space-modal-overlay">
+    <div class="modal">
+      <h3 id="space-modal-title">새 공간 추가</h3>
+      <label>공간 이름</label>
+      <input type="text" id="space-name-input" placeholder="예: 여행 백팩, 책상 서랍" />
+      <label>공간 종류</label>
+      <div class="type-selector" id="type-selector">
+        <button class="type-btn active" data-type="bag">🎒 가방</button>
+        <button class="type-btn" data-type="drawer">🗄️ 서랍</button>
+        <button class="type-btn" data-type="closet">👕 옷장</button>
+        <button class="type-btn" data-type="desk">🖥️ 책상</button>
+        <button class="type-btn" data-type="locker">🔒 사물함</button>
+        <button class="type-btn" data-type="shelf">📚 선반</button>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="space-modal-cancel">취소</button>
+        <button class="btn-primary" id="space-modal-confirm">만들기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add/Edit Cell -->
+  <div class="modal-overlay" id="cell-modal-overlay">
+    <div class="modal">
+      <h3 id="cell-modal-title">셀 추가</h3>
+      <label>셀 이름</label>
+      <input type="text" id="cell-name-input" placeholder="예: 케이블 파우치, 여권" />
+      <label>내용물</label>
+      <textarea id="cell-items-input" placeholder="한 줄에 하나씩 입력&#10;예: 충전기&#10;이어폰&#10;USB-C 케이블"></textarea>
+      <label>색상 테마</label>
+      <div class="color-selector" id="color-selector">
+        <button class="color-btn active" data-color="blue" style="background:#dbeafe"></button>
+        <button class="color-btn" data-color="green" style="background:#dcfce7"></button>
+        <button class="color-btn" data-color="amber" style="background:#fef3c7"></button>
+        <button class="color-btn" data-color="pink" style="background:#fce7f3"></button>
+        <button class="color-btn" data-color="purple" style="background:#ede9fe"></button>
+        <button class="color-btn" data-color="red" style="background:#fee2e2"></button>
+        <button class="color-btn" data-color="gray" style="background:#f3f4f6"></button>
+      </div>
+      <label>아이콘</label>
+      <div class="icon-selector" id="icon-selector">
+        <button class="icon-btn active" data-icon="📦">📦</button>
+        <button class="icon-btn" data-icon="🔌">🔌</button>
+        <button class="icon-btn" data-icon="👕">👕</button>
+        <button class="icon-btn" data-icon="💊">💊</button>
+        <button class="icon-btn" data-icon="📄">📄</button>
+        <button class="icon-btn" data-icon="💳">💳</button>
+        <button class="icon-btn" data-icon="🎧">🎧</button>
+        <button class="icon-btn" data-icon="📸">📸</button>
+        <button class="icon-btn" data-icon="🧴">🧴</button>
+        <button class="icon-btn" data-icon="🔑">🔑</button>
+        <button class="icon-btn" data-icon="🍱">🍱</button>
+        <button class="icon-btn" data-icon="📚">📚</button>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="cell-modal-cancel">취소</button>
+        <button class="btn-primary" id="cell-modal-confirm">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
