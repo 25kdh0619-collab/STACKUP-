@@ -3,83 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PackMap — 내 공간을 지도로</title>
+  <title>STACKUP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Gmarket+Sans:wght@300;500;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+
   <!-- Sidebar -->
   <aside id="sidebar">
     <div class="logo">
-      <span class="logo-icon">⬡</span>
-      <span class="logo-text">PackMap</span>
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="16" width="8" height="8" fill="#2563EB"/>
+        <rect x="14" y="16" width="8" height="8" fill="#93C5FD"/>
+        <rect x="9" y="8" width="8" height="8" fill="#1D4ED8"/>
+        <rect x="14" y="4" width="4" height="4" fill="#BFDBFE" opacity="0.8"/>
+      </svg>
+      <span class="logo-text">STACKUP</span>
     </div>
+
+    <div class="sidebar-section-label">내 공간</div>
     <nav class="space-list" id="space-list"></nav>
-    <button class="add-space-btn" id="add-space-btn">
-      <span>+</span> 공간 추가
-    </button>
+    <button class="add-space-btn" id="add-space-btn">+ 공간 추가</button>
   </aside>
 
   <!-- Main -->
   <main id="main">
+
     <!-- Empty state -->
     <div class="empty-state" id="empty-state">
-      <div class="empty-icon">⬡</div>
-      <h2>공간을 선택하거나 추가하세요</h2>
-      <p>백팩, 서랍, 옷장, 책상 — 모든 공간을 시각적으로 기록하세요.</p>
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <rect x="6" y="28" width="14" height="14" fill="#2563EB" opacity="0.15" rx="2"/>
+        <rect x="22" y="28" width="14" height="14" fill="#2563EB" opacity="0.25" rx="2"/>
+        <rect x="14" y="14" width="14" height="14" fill="#2563EB" opacity="0.4" rx="2"/>
+        <rect x="22" y="6" width="8" height="8" fill="#2563EB" opacity="0.6" rx="1"/>
+      </svg>
+      <h2>공간을 추가해보세요</h2>
+      <p>백팩, 서랍, 옷장 — 모든 공간을<br/>레고처럼 직접 설계하세요.</p>
       <button class="btn-primary" onclick="document.getElementById('add-space-btn').click()">첫 공간 만들기</button>
     </div>
 
     <!-- Editor -->
     <div class="editor" id="editor" style="display:none">
       <div class="editor-header">
-        <div>
-          <div class="editor-title-row">
-            <span class="space-type-badge" id="editor-type-badge"></span>
+        <div class="editor-header-left">
+          <span class="space-emoji-big" id="editor-emoji"></span>
+          <div>
             <h1 class="editor-title" id="editor-title" contenteditable="true" spellcheck="false"></h1>
+            <p class="editor-meta" id="editor-meta"></p>
           </div>
-          <p class="editor-subtitle" id="editor-item-count"></p>
         </div>
-        <div class="editor-actions">
-          <button class="btn-ghost" id="toggle-view-btn">격자 보기</button>
-          <button class="btn-danger" id="delete-space-btn">삭제</button>
+        <div class="editor-header-right">
+          <button class="btn-ghost" id="toggle-view-btn">목록 보기</button>
+          <button class="btn-ghost" id="delete-space-btn">삭제</button>
         </div>
       </div>
 
-      <!-- Grid area -->
-      <div class="grid-wrapper">
-        <div class="cell-grid" id="cell-grid"></div>
-        <button class="add-cell-btn" id="add-cell-btn">
-          <span>＋</span>
-          <span>셀 추가</span>
+      <!-- Canvas -->
+      <div class="canvas-wrapper" id="canvas-wrapper">
+        <div class="canvas-hint">셀을 자유롭게 드래그해서 배치하세요</div>
+        <div class="cell-canvas" id="cell-canvas"></div>
+        <button class="add-cell-fab" id="add-cell-btn">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><line x1="9" y1="2" x2="9" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="2" y1="9" x2="16" y2="9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          셀 추가
         </button>
       </div>
 
-      <!-- Item list view (hidden by default) -->
+      <!-- List View -->
       <div class="list-view" id="list-view" style="display:none">
-        <div class="list-header">
-          <span>이름</span><span>위치</span><span>수량</span><span>태그</span>
-        </div>
-        <div id="list-body"></div>
+        <table class="list-table">
+          <thead><tr><th>아이템</th><th>셀</th><th>수량</th></tr></thead>
+          <tbody id="list-body"></tbody>
+        </table>
       </div>
     </div>
   </main>
 
-  <!-- Modal: Add/Edit Space -->
+  <!-- Modal: Space -->
   <div class="modal-overlay" id="space-modal-overlay">
     <div class="modal">
-      <h3 id="space-modal-title">새 공간 추가</h3>
-      <label>공간 이름</label>
+      <div class="modal-header">
+        <h3>새 공간</h3>
+        <button class="modal-close" id="space-modal-close">✕</button>
+      </div>
+      <label>이름</label>
       <input type="text" id="space-name-input" placeholder="예: 여행 백팩, 책상 서랍" />
-      <label>공간 종류</label>
-      <div class="type-selector" id="type-selector">
-        <button class="type-btn active" data-type="bag">🎒 가방</button>
-        <button class="type-btn" data-type="drawer">🗄️ 서랍</button>
-        <button class="type-btn" data-type="closet">👕 옷장</button>
-        <button class="type-btn" data-type="desk">🖥️ 책상</button>
-        <button class="type-btn" data-type="locker">🔒 사물함</button>
-        <button class="type-btn" data-type="shelf">📚 선반</button>
+      <label>종류</label>
+      <div class="type-grid" id="type-selector">
+        <button class="type-btn active" data-type="bag" data-emoji="🎒">🎒<span>가방</span></button>
+        <button class="type-btn" data-type="drawer" data-emoji="🗄️">🗄️<span>서랍</span></button>
+        <button class="type-btn" data-type="closet" data-emoji="👕">👕<span>옷장</span></button>
+        <button class="type-btn" data-type="desk" data-emoji="🖥️">🖥️<span>책상</span></button>
+        <button class="type-btn" data-type="locker" data-emoji="🔒">🔒<span>사물함</span></button>
+        <button class="type-btn" data-type="shelf" data-emoji="📚">📚<span>선반</span></button>
       </div>
       <div class="modal-footer">
         <button class="btn-ghost" id="space-modal-cancel">취소</button>
@@ -88,49 +104,57 @@
     </div>
   </div>
 
-  <!-- Modal: Add/Edit Cell -->
+  <!-- Modal: Cell -->
   <div class="modal-overlay" id="cell-modal-overlay">
     <div class="modal">
-      <h3 id="cell-modal-title">셀 추가</h3>
+      <div class="modal-header">
+        <h3 id="cell-modal-title">셀 추가</h3>
+        <button class="modal-close" id="cell-modal-close">✕</button>
+      </div>
       <label>셀 이름</label>
-      <input type="text" id="cell-name-input" placeholder="예: 케이블 파우치, 여권" />
-      <label>내용물</label>
-      <textarea id="cell-items-input" placeholder="한 줄에 하나씩 입력&#10;예: 충전기&#10;이어폰&#10;USB-C 케이블"></textarea>
-      <label>색상 테마</label>
-      <div class="color-selector" id="color-selector">
-        <button class="color-btn active" data-color="blue" style="background:#dbeafe"></button>
-        <button class="color-btn" data-color="green" style="background:#dcfce7"></button>
-        <button class="color-btn" data-color="amber" style="background:#fef3c7"></button>
-        <button class="color-btn" data-color="pink" style="background:#fce7f3"></button>
-        <button class="color-btn" data-color="purple" style="background:#ede9fe"></button>
-        <button class="color-btn" data-color="red" style="background:#fee2e2"></button>
-        <button class="color-btn" data-color="gray" style="background:#f3f4f6"></button>
+      <input type="text" id="cell-name-input" placeholder="예: 케이블, 여권, 상의" />
+      <label>내용물 <span style="font-weight:300;opacity:.6">(한 줄에 하나)</span></label>
+      <textarea id="cell-items-input" placeholder="충전기&#10;이어폰&#10;USB 허브"></textarea>
+      <label>색상</label>
+      <div class="color-row" id="color-selector">
+        <button class="color-swatch active" data-color="blue" style="background:#DBEAFE;border-color:#93C5FD"></button>
+        <button class="color-swatch" data-color="indigo" style="background:#E0E7FF;border-color:#A5B4FC"></button>
+        <button class="color-swatch" data-color="green" style="background:#DCFCE7;border-color:#86EFAC"></button>
+        <button class="color-swatch" data-color="amber" style="background:#FEF3C7;border-color:#FCD34D"></button>
+        <button class="color-swatch" data-color="pink" style="background:#FCE7F3;border-color:#F9A8D4"></button>
+        <button class="color-swatch" data-color="red" style="background:#FEE2E2;border-color:#FCA5A5"></button>
+        <button class="color-swatch" data-color="slate" style="background:#F1F5F9;border-color:#CBD5E1"></button>
       </div>
       <label>아이콘</label>
-      <div class="icon-selector" id="icon-selector">
-        <button class="icon-btn active" data-icon="📦">📦</button>
-        <button class="icon-btn" data-icon="🔌">🔌</button>
-        <button class="icon-btn" data-icon="👕">👕</button>
-        <button class="icon-btn" data-icon="💊">💊</button>
-        <button class="icon-btn" data-icon="📄">📄</button>
-        <button class="icon-btn" data-icon="💳">💳</button>
-        <button class="icon-btn" data-icon="🎧">🎧</button>
-        <button class="icon-btn" data-icon="📸">📸</button>
-        <button class="icon-btn" data-icon="🧴">🧴</button>
-        <button class="icon-btn" data-icon="🔑">🔑</button>
-        <button class="icon-btn" data-icon="🍱">🍱</button>
-        <button class="icon-btn" data-icon="📚">📚</button>
+      <div class="icon-row" id="icon-selector">
+        <button class="icon-opt active" data-icon="📦">📦</button>
+        <button class="icon-opt" data-icon="🔌">🔌</button>
+        <button class="icon-opt" data-icon="👕">👕</button>
+        <button class="icon-opt" data-icon="💊">💊</button>
+        <button class="icon-opt" data-icon="📄">📄</button>
+        <button class="icon-opt" data-icon="💳">💳</button>
+        <button class="icon-opt" data-icon="🎧">🎧</button>
+        <button class="icon-opt" data-icon="📸">📸</button>
+        <button class="icon-opt" data-icon="🧴">🧴</button>
+        <button class="icon-opt" data-icon="🔑">🔑</button>
+        <button class="icon-opt" data-icon="🍱">🍱</button>
+        <button class="icon-opt" data-icon="📚">📚</button>
+        <button class="icon-opt" data-icon="👟">👟</button>
+        <button class="icon-opt" data-icon="🧢">🧢</button>
+        <button class="icon-opt" data-icon="💡">💡</button>
+        <button class="icon-opt" data-icon="🛠️">🛠️</button>
       </div>
       <div class="modal-footer">
-        <button class="btn-ghost" id="cell-modal-cancel">취소</button>
-        <button class="btn-primary" id="cell-modal-confirm">저장</button>
+        <button class="btn-danger-sm" id="cell-delete-btn" style="display:none">삭제</button>
+        <div style="display:flex;gap:8px;margin-left:auto">
+          <button class="btn-ghost" id="cell-modal-cancel">취소</button>
+          <button class="btn-primary" id="cell-modal-confirm">저장</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Toast -->
   <div class="toast" id="toast"></div>
-
   <script src="js/app.js"></script>
 </body>
 </html>
